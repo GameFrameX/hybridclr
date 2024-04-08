@@ -10,10 +10,12 @@ namespace utils
 {
     MemoryPoolAddressSanitizer::MemoryPoolAddressSanitizer()
     {
+        m_TotalSize = 0;
     }
 
     MemoryPoolAddressSanitizer::MemoryPoolAddressSanitizer(size_t initialSize)
     {
+        m_TotalSize = initialSize;
     }
 
     MemoryPoolAddressSanitizer::~MemoryPoolAddressSanitizer()
@@ -27,6 +29,7 @@ namespace utils
     void* MemoryPoolAddressSanitizer::Malloc(size_t size)
     {
         void* allocation = malloc(size);
+        m_TotalSize += size;
         m_Allocations.push_back(allocation);
         return allocation;
     }
@@ -36,6 +39,10 @@ namespace utils
         void* allocation = calloc(count, size);
         m_Allocations.push_back(allocation);
         return allocation;
+    }
+
+    size_t MemoryPoolAddressSanitizer::TotalSize() {
+        return m_TotalSize;
     }
 }
 }

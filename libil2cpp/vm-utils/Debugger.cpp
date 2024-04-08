@@ -59,7 +59,11 @@ extern "C"
     void unity_debugger_agent_breakpoint(Il2CppSequencePoint* sequencePoint);
     void unity_debugger_agent_pausepoint();
     void mono_debugger_install_runtime_callbacks(MonoDebuggerRuntimeCallbacks* cbs);
+#if IL2CPP_WEIXINMINIGAME_DEBUGGER
+    int32_t unity_debugger_agent_is_global_breakpoint_active();
+#else
     int32_t unity_debugger_agent_is_global_breakpoint_active(void* singleStepRequest);
+#endif
     int32_t unity_debugger_agent_is_single_stepping();
     void unity_debugger_agent_handle_exception(Il2CppException *exc);
     int32_t il2cpp_mono_methods_match(const MethodInfo* left, const MethodInfo* right);
@@ -162,8 +166,9 @@ namespace utils
     {
 #if defined(RUNTIME_IL2CPP)
         InitializeInterpCallbacks();
-
+#if !IL2CPP_WEIXINMINIGAME_DEBUGGER
         os::SocketBridge::WaitForInitialization();
+#endif
 
         mono_debugger_il2cpp_init();
         mono_debugger_agent_parse_options(options);
@@ -363,7 +368,9 @@ namespace utils
     {
         if (!Debugger::GetIsDebuggerAttached())
             return false;
-#if defined(RUNTIME_IL2CPP)
+#if IL2CPP_WEIXINMINIGAME_DEBUGGER
+        return unity_debugger_agent_is_global_breakpoint_active();
+#elif defined(RUNTIME_IL2CPP)
         return unity_debugger_agent_is_global_breakpoint_active(NULL);
 #else
         IL2CPP_ASSERT(0 && "The managed debugger is only supported for the libil2cpp runtime backend.");

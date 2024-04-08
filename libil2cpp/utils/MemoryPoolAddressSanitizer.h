@@ -22,8 +22,10 @@ namespace utils
         ~MemoryPoolAddressSanitizer();
         void* Malloc(size_t size);
         void* Calloc(size_t count, size_t size);
+        size_t TotalSize();
     private:
         std::vector<void*> m_Allocations;
+        size_t m_TotalSize;
     };
 } /* namespace utils */
 } /* namespace il2cpp */

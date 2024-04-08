@@ -1434,12 +1434,19 @@ namespace vm
         }
         else if (klass->property_count != 0)
         {
-            const PropertyInfo** properties = (const PropertyInfo**)MetadataCalloc(klass->property_count, sizeof(PropertyInfo*), IL2CPP_MSTAT_PROPERTY);
+            // klass->properties maybe inited by GetOrSetupOnePropertyLocked
+            if(klass->properties == nullptr)
+                klass->properties = (const PropertyInfo**)MetadataCalloc(klass->property_count, sizeof(PropertyInfo*), IL2CPP_MSTAT_PROPERTY);
+
+            const PropertyInfo** properties = klass->properties;
 
             PropertyIndex end = klass->property_count;
 
             for (PropertyIndex propertyIndex = 0; propertyIndex < end; ++propertyIndex)
             {
+                if (properties[propertyIndex] != nullptr)
+                    continue;
+
                 Il2CppMetadataPropertyInfo propertyInfo = MetadataCache::GetPropertyInfo(klass, propertyIndex);
 
                 PropertyInfo* newProperty = (PropertyInfo*)MetadataCalloc(1,sizeof(PropertyInfo), IL2CPP_MSTAT_PROPERTY);
@@ -1453,14 +1460,12 @@ namespace vm
 
                 properties[propertyIndex] = newProperty;
             }
-
-            klass->properties = properties;
         }
     }
 
     void Class::SetupProperties(Il2CppClass *klass)
     {
-        if (!klass->properties && klass->property_count)
+        if (klass->property_count)
         {
             il2cpp::os::FastAutoLock lock(&g_MetadataLock);
             SetupPropertiesLocked(klass, lock);

@@ -470,6 +470,7 @@ namespace metadata
         for (Il2CppGenericClassSet::iterator genericClass = s_GenericClassSet.begin(); genericClass != s_GenericClassSet.end(); genericClass++)
             (*genericClass).key->cached_class = NULL;
         s_GenericClassSet.clear();
+        s_RGCTXDataToClassMap.clear();
     }
 
     static int s_MaximumRuntimeGenericDepth;

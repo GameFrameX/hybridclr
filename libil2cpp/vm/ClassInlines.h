@@ -38,11 +38,7 @@ namespace vm
         static IL2CPP_NO_INLINE const VirtualInvokeData& GetVirtualInvokeData(Il2CppMethodSlot slot, const Il2CppObject* obj);
 
         //internal
-        static IL2CPP_FORCE_INLINE const VirtualInvokeData& GetInterfaceInvokeDataFromVTable(Il2CppObject* obj,const Il2CppClass* itf, Il2CppMethodSlot slot)
-        {
-            return *GetInterfaceInvokeDataFromVTable(obj->klass,itf,slot);
-        }
-
+        static IL2CPP_NO_INLINE const VirtualInvokeData& GetInterfaceInvokeDataFromVTable(Il2CppObject* obj,const Il2CppClass* itf, Il2CppMethodSlot slot);
         static IL2CPP_NO_INLINE const VirtualInvokeData* GetInterfaceInvokeDataFromVTable(Il2CppClass* klass, const Il2CppClass* itf, Il2CppMethodSlot slot);
 
         // we don't want this method to get inlined because that makes GetInterfaceInvokeDataFromVTable method itself very large and performance suffers

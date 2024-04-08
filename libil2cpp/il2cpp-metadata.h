@@ -4,8 +4,16 @@
 #include <stdint.h>
 #include "il2cpp-tokentype.h"
 
-typedef int32_t TypeIndex;
-typedef int32_t TypeDefinitionIndex;
+#if SLIM_GLOBAL_METADATA_FILE
+typedef uint16_t slim_int32_t;
+#define slim_int32_t_invalid UINT16_MAX;
+#else
+typedef int32_t slim_int32_t;
+#define slim_int32_t_invalid  -1;
+#endif
+
+typedef slim_int32_t TypeIndex;
+typedef slim_int32_t TypeDefinitionIndex;
 typedef int32_t FieldIndex;
 typedef int32_t DefaultValueIndex;
 typedef int32_t DefaultValueDataIndex;
@@ -13,13 +21,13 @@ typedef int32_t CustomAttributeIndex;
 typedef int32_t ParameterIndex;
 typedef int32_t MethodIndex;
 typedef int32_t GenericMethodIndex;
-typedef int32_t PropertyIndex;
-typedef int32_t EventIndex;
-typedef int32_t GenericContainerIndex;
-typedef int32_t GenericParameterIndex;
+typedef slim_int32_t PropertyIndex;
+typedef slim_int32_t EventIndex;
+typedef slim_int32_t GenericContainerIndex;
+typedef slim_int32_t GenericParameterIndex;
 typedef int16_t GenericParameterConstraintIndex;
-typedef int32_t NestedTypeIndex;
-typedef int32_t InterfacesIndex;
+typedef slim_int32_t NestedTypeIndex;
+typedef slim_int32_t InterfacesIndex;
 typedef int32_t VTableIndex;
 typedef int32_t RGCTXIndex;
 typedef int32_t StringIndex;
@@ -42,16 +50,16 @@ typedef int32_t GenericContainerParameterIndex;
 typedef int32_t AssemblyTypeIndex;
 typedef int32_t AssemblyExportedTypeIndex;
 
-static const TypeIndex kTypeIndexInvalid = -1;
-static const TypeDefinitionIndex kTypeDefinitionIndexInvalid = -1;
+static const TypeIndex kTypeIndexInvalid = slim_int32_t_invalid;
+static const TypeDefinitionIndex kTypeDefinitionIndexInvalid = slim_int32_t_invalid;
 static const DefaultValueDataIndex kDefaultValueIndexNull = -1;
 static const CustomAttributeIndex kCustomAttributeIndexInvalid = -1;
-static const EventIndex kEventIndexInvalid = -1;
+static const EventIndex kEventIndexInvalid = slim_int32_t_invalid;
 static const FieldIndex kFieldIndexInvalid = -1;
 static const MethodIndex kMethodIndexInvalid = -1;
-static const PropertyIndex kPropertyIndexInvalid = -1;
-static const GenericContainerIndex kGenericContainerIndexInvalid = -1;
-static const GenericParameterIndex kGenericParameterIndexInvalid = -1;
+static const PropertyIndex kPropertyIndexInvalid = slim_int32_t_invalid;
+static const GenericContainerIndex kGenericContainerIndexInvalid = slim_int32_t_invalid;
+static const GenericParameterIndex kGenericParameterIndexInvalid = slim_int32_t_invalid;
 static const RGCTXIndex kRGCTXIndexInvalid = -1;
 static const StringLiteralIndex kStringLiteralIndexInvalid = -1;
 static const InteropDataIndex kInteropDataIndexInvalid = -1;

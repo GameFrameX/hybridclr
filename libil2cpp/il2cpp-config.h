@@ -28,6 +28,10 @@
     #define INTPTR_MAX 2147483647
 #endif
 
+#if PLATFORM_WEIXINMINIGAME
+#include "global_metadata_config.h" //it should be il2cpp output folder
+#endif
+
 #ifndef IL2CPP_METHOD_ATTR
 #define IL2CPP_METHOD_ATTR
 #endif
@@ -586,11 +590,11 @@ char(*il2cpp_array_size_helper(Type(&array)[Size]))[Size];
 #endif
 
 #ifndef IL2CPP_ENABLE_LAZY_INIT
-#define IL2CPP_ENABLE_LAZY_INIT (IL2CPP_TARGET_JAVASCRIPT && PLATFORM_WEIXINMINIGAME)
+#define IL2CPP_ENABLE_LAZY_INIT (IL2CPP_TARGET_JAVASCRIPT && PLATFORM_WEIXINMINIGAME && !IL2CPP_MONO_DEBUGGER)
 #endif
 
 #ifndef IL2CPP_SLIM_CLASS
-#define IL2CPP_SLIM_CLASS (IL2CPP_TARGET_JAVASCRIPT && PLATFORM_WEIXINMINIGAME)
+#define IL2CPP_SLIM_CLASS (IL2CPP_TARGET_JAVASCRIPT && PLATFORM_WEIXINMINIGAME && !IL2CPP_MONO_DEBUGGER)
 #endif
 
 // remove COM/winRT related stuff to slim the minigame platform
@@ -601,6 +605,9 @@ char(*il2cpp_array_size_helper(Type(&array)[Size]))[Size];
 #ifndef IL2CPP_ENABLE_MEM_STATS
 #define IL2CPP_ENABLE_MEM_STATS 0
 #endif
+
+//defined by buildprogram
+//#define SLIM_GLOBAL_METADATA_FILE 1
 
 #if !IL2CPP_DEBUG
 #define IL2CPP_ASSERT(expr) void(0)

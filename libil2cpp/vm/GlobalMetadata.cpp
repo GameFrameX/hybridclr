@@ -449,7 +449,11 @@ bool il2cpp::vm::GlobalMetadata::Initialize(int32_t* imagesCount, int32_t* assem
 
     s_GlobalMetadataHeader = (const Il2CppGlobalMetadataHeader*)s_GlobalMetadata;
     IL2CPP_ASSERT(s_GlobalMetadataHeader->sanity == 0xFAB11BAF);
+#if SLIM_GLOBAL_METADATA_FILE
+    IL2CPP_ASSERT(s_GlobalMetadataHeader->version == 30);
+#else
     IL2CPP_ASSERT(s_GlobalMetadataHeader->version == 29);
+#endif
     IL2CPP_ASSERT(s_GlobalMetadataHeader->stringLiteralOffset == sizeof(Il2CppGlobalMetadataHeader));
 
     s_MetadataImagesCount = *imagesCount = s_GlobalMetadataHeader->imagesSize / sizeof(Il2CppImageDefinition);
@@ -1490,7 +1494,7 @@ Il2CppClass* il2cpp::vm::GlobalMetadata::GetContainerDeclaringType(Il2CppMetadat
     if (genericContainer->is_method)
         return GetMethodInfoFromMethodDefinitionIndex(genericContainer->ownerIndex)->klass;
 
-    return GetTypeInfoFromTypeDefinitionIndex(genericContainer->ownerIndex);
+    return GetTypeInfoFromTypeDefinitionIndex(static_cast<TypeDefinitionIndex>(genericContainer->ownerIndex));
 }
 
 Il2CppClass* il2cpp::vm::GlobalMetadata::GetParameterDeclaringType(Il2CppMetadataGenericParameterHandle handle)
@@ -1502,7 +1506,7 @@ Il2CppClass* il2cpp::vm::GlobalMetadata::GetParameterDeclaringType(Il2CppMetadat
     if (genericContainer->is_method)
         return GetMethodInfoFromMethodDefinitionIndex(genericContainer->ownerIndex)->klass;
 
-    return GetTypeInfoFromTypeDefinitionIndex(genericContainer->ownerIndex);
+    return GetTypeInfoFromTypeDefinitionIndex(static_cast<TypeDefinitionIndex>(genericContainer->ownerIndex));
 }
 
 Il2CppMetadataGenericParameterHandle il2cpp::vm::GlobalMetadata::GetGenericParameterFromIndex(Il2CppMetadataGenericContainerHandle handle, GenericContainerParameterIndex index)

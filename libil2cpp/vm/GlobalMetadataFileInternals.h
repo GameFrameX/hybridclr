@@ -57,6 +57,9 @@ static inline uint32_t GetDecodedMethodIndex(EncodedMethodIndex index)
 
 #endif
 
+#if SLIM_GLOBAL_METADATA_FILE
+#pragma pack(push, p2, 1)
+#endif
 typedef struct Il2CppInterfaceOffsetPair
 {
     TypeIndex interfaceTypeIndex;
@@ -162,7 +165,11 @@ typedef struct Il2CppMethodDefinition
     uint16_t flags;
     uint16_t iflags;
     uint16_t slot;
+#if SLIM_GLOBAL_METADATA_FILE
+    uint8_t parameterCount;
+#else
     uint16_t parameterCount;
+#endif
 } Il2CppMethodDefinition;
 
 typedef struct Il2CppEventDefinition
@@ -272,6 +279,9 @@ typedef struct Il2CppWindowsRuntimeTypeNamePair
     TypeIndex typeIndex;
 } Il2CppWindowsRuntimeTypeNamePair;
 
+#if SLIM_GLOBAL_METADATA_FILE
+#pragma pack(pop, p2)
+#endif
 #pragma pack(push, p1,4)
 typedef struct Il2CppGlobalMetadataHeader
 {

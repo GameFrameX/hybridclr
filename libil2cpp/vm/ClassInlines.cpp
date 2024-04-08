@@ -70,6 +70,15 @@ namespace vm
         return NULL;
     }
 
+    const VirtualInvokeData& ClassInlines::GetInterfaceInvokeDataFromVTable(Il2CppObject* obj,const Il2CppClass* itf, Il2CppMethodSlot slot)
+    {
+        const VirtualInvokeData* result = GetInterfaceInvokeDataFromVTable(obj->klass,itf,slot);
+        if (result)
+            return *result;
+
+        return GetInterfaceInvokeDataFromVTableSlowPath(obj,itf,slot);
+    }
+
     const VirtualInvokeData& ClassInlines::GetInterfaceInvokeDataFromVTableSlowPath(Il2CppObject* obj, const Il2CppClass* itf, Il2CppMethodSlot slot)
     {
         const Il2CppClass* klass = obj->klass;

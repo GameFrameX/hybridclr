@@ -290,12 +290,8 @@ il2cpp::gc::GarbageCollector::SetMode(Il2CppGCMode mode)
     }
 }
 
-#if ENABLE_HMI_MODE
 void
-il2cpp::gc::GarbageCollector::RegisterThread(void *baseptr)
-#else
-void il2cpp::gc::GarbageCollector::RegisterThread()
-#endif
+il2cpp::gc::GarbageCollector::RegisterThread()
 {
 #if defined(GC_THREADS) && !IL2CPP_TARGET_JAVASCRIPT
     struct GC_stack_base sb;
@@ -304,24 +300,17 @@ void il2cpp::gc::GarbageCollector::RegisterThread()
     res = GC_get_stack_base(&sb);
     if (res != GC_SUCCESS)
     {
-#if ENABLE_HMI_MODE
-        sb.mem_base = baseptr;
-#endif
         /* Can't determine the register stack bounds */
         IL2CPP_ASSERT(false && "GC_get_stack_base () failed, aborting.");
         /* Abort we can't scan the stack, so we can't use the GC */
-#if !ENABLE_HMI_MODE
         abort();
-#endif
     }
     res = GC_register_my_thread(&sb);
     if ((res != GC_SUCCESS) && (res != GC_DUPLICATE))
     {
         IL2CPP_ASSERT(false && "GC_register_my_thread () failed.");
         /* Abort we can't use the GC on this thread, so we can't run managed code */
-#if !ENABLE_HMI_MODE
         abort();
-#endif
     }
 #endif
 }

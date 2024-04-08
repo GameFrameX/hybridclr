@@ -142,12 +142,7 @@ namespace vm
         if (managedThread != NULL)
             return managedThread;
 
-#if ENABLE_HMI_MODE
-        int temp = 0;
-        gc::GarbageCollector::RegisterThread(&temp);
-#else
         gc::GarbageCollector::RegisterThread();
-#endif
 
         StackTrace::InitializeStackTracesForCurrentThread();
 
@@ -792,12 +787,7 @@ namespace vm
         startData->m_Semaphore->Wait();
 
         {
-#if ENABLE_HMI_MODE
-            int temp = 0;
-            gc::GarbageCollector::RegisterThread(&temp);
-#else
             gc::GarbageCollector::RegisterThread();
-#endif
 
             il2cpp::vm::StackTrace::InitializeStackTracesForCurrentThread();
 
