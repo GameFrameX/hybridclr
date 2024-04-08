@@ -28,8 +28,13 @@
     #define INTPTR_MAX 2147483647
 #endif
 
-#if PLATFORM_WEIXINMINIGAME
-#include "global_metadata_config.h" //it should be il2cpp output folder
+//#if PLATFORM_WEIXINMINIGAME
+//#include "global_metadata_config.h" //it should be il2cpp output folder
+//#endif
+
+
+#if SLIM_GLOBAL_METADATA_FILE == 1
+#error "hybridclr doesn't support 'SLIM_GLOBAL_METADATA_FILE == 1' "
 #endif
 
 #ifndef IL2CPP_METHOD_ATTR
