@@ -117,15 +117,7 @@ namespace vm
     public:
         inline const StackFrames* GetStackFrames()
         {
-            StackFrames* stackFrames = GetStackFramesRaw();
-            if (stackFrames == NULL)
-                return stackFrames;
-            //stackFrames->clear();
-
-            //os::StackTrace::WalkStack(&NativeMethodStack::GetStackFramesCallback, stackFrames, os::StackTrace::kFirstCalledToLastCalled);
-
-            hybridclr::interpreter::InterpreterModule::GetCurrentThreadMachineState().CollectFramesWithoutDuplicates(stackFrames);
-            return stackFrames;
+            return GetStackFramesRaw();
         }
 
         inline const StackFrames* GetCachedStackFrames(int32_t depth, const void* stackPointer)
