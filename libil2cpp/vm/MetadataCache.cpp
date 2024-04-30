@@ -973,10 +973,6 @@ static bool MatchTokens(Il2CppTokenIndexMethodTuple key, Il2CppTokenIndexMethodT
 
 Il2CppMethodPointer il2cpp::vm::MetadataCache::GetReversePInvokeWrapper(const Il2CppImage* image, const MethodInfo* method)
 {
-    if (hybridclr::metadata::IsInterpreterImage(image))
-    {
-        return hybridclr::metadata::MetadataModule::GetReversePInvokeWrapper(image, method);
-    }
     if (image->codeGenModule->reversePInvokeWrapperCount == 0)
         return NULL;
 
