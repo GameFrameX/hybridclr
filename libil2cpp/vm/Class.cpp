@@ -57,15 +57,31 @@ namespace vm
 {
     const int Class::IgnoreNumberOfArguments = -1;
 
-    static il2cpp::utils::dynamic_array<Il2CppClass*> s_staticFieldData;
     static int32_t s_FinalizerSlot = -1;
     static int32_t s_GetHashCodeSlot = -1;
     static Il2CppClass* s_EmptyClassList[] = {NULL};
+
+    struct ClassContext
+    {
+        il2cpp::utils::dynamic_array<Il2CppClass*> m_staticFieldData;
+    };
+    static ClassContext* s_ClassContext = nullptr;
 
     static void SetupGCDescriptor(Il2CppClass* klass, const il2cpp::os::FastAutoLock& lock);
     static void GetBitmapNoInit(Il2CppClass* klass, size_t* bitmap, size_t& maxSetBit, size_t parentOffset, const il2cpp::os::FastAutoLock* lockPtr);
     static Il2CppClass* ResolveGenericInstanceType(Il2CppClass*, const il2cpp::vm::TypeNameParseInfo&, TypeSearchFlags searchFlags);
     static void SetupVTable(Il2CppClass *klass, const il2cpp::os::FastAutoLock& lock);
+
+    void Class::AllocateStaticData()
+    {
+        s_ClassContext = new ClassContext();
+    }
+
+    void Class::FreeStaticData()
+    {
+        delete s_ClassContext;
+        s_ClassContext = nullptr;
+    }
 
     Il2CppClass* Class::FromIl2CppType(const Il2CppType* type, bool throwOnError)
     {
@@ -345,9 +361,6 @@ namespace vm
         if (!klass->has_finalize)
             return NULL;
 
-#if IL2CPP_TINY
-        IL2CPP_ASSERT(0 && "System.Object does not have a finalizer in the Tiny mscorlib, so we don't have a finalizer slot.");
-#endif
         return klass->vtable[s_FinalizerSlot].method;
     }
 
@@ -1000,7 +1013,7 @@ namespace vm
         if (klass->static_fields_size)
         {
             klass->static_fields = il2cpp::gc::GarbageCollector::AllocateFixed(klass->static_fields_size, NULL);
-            s_staticFieldData.push_back(klass);
+            s_ClassContext->m_staticFieldData.push_back(klass);
 
             il2cpp_runtime_stats.class_static_data_size += klass->static_fields_size;
         }
@@ -1156,6 +1169,7 @@ namespace vm
                 if (newMethod->genericContainerHandle)
                     newMethod->is_generic = true;
                 newMethod->has_full_generic_sharing_signature = false;
+                newMethod->is_unmanaged_callers_only = methodInfo.isUnmangedCallersOnly;
 
                 if (newMethod->virtualMethodPointer)
                 {
@@ -1542,10 +1556,8 @@ namespace vm
                 else if (!strcmp(vmethod->name, "Finalize"))
                     s_FinalizerSlot = slot;
             }
-#if !IL2CPP_TINY
             IL2CPP_ASSERT(s_FinalizerSlot > 0);
             IL2CPP_ASSERT(s_GetHashCodeSlot > 0);
-#endif
         }
 
         bool canBeInstantiated = !Class::IsGeneric(klass) && !il2cpp::metadata::GenericMetadata::ContainsGenericParameters(klass);
@@ -1900,7 +1912,7 @@ namespace vm
 
     const il2cpp::utils::dynamic_array<Il2CppClass*>& Class::GetStaticFieldData()
     {
-        return s_staticFieldData;
+        return s_ClassContext->m_staticFieldData;
     }
 
     const size_t kWordSize = (8 * sizeof(size_t));
@@ -1982,7 +1994,7 @@ namespace vm
                         maxSetBit = std::max(maxSetBit, offset / sizeof(void*));
                         break;
                     case IL2CPP_TYPE_GENERICINST:
-                        if (!Type::GenericInstIsValuetype(type))
+                        if (!Type::IsValueType(type))
                         {
                             IL2CPP_ASSERT(0 == (offset % sizeof(void*)));
                             set_bit(bitmap, offset / sizeof(void*));

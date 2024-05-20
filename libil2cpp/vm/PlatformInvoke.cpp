@@ -429,7 +429,6 @@ namespace vm
         return (Il2CppCallConvention)(callConv - 1);
     }
 
-#if !IL2CPP_TINY
     intptr_t PlatformInvoke::MarshalDelegate(Il2CppDelegate* d)
     {
         if (d == NULL)
@@ -524,7 +523,5 @@ namespace vm
     {
         return d->delegate_trampoline != NULL;
     }
-
-#endif // !IL2CPP_TINY
 } /* namespace vm */
 } /* namespace il2cpp */
