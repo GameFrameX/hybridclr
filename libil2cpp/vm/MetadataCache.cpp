@@ -1615,6 +1615,10 @@ const uint8_t* il2cpp::vm::MetadataCache::GetParameterDefaultValueDataFromIndex(
 
 int il2cpp::vm::MetadataCache::GetFieldMarshaledSizeForField(const FieldInfo* field)
 {
+    if (hybridclr::metadata::IsInterpreterType(field->parent))
+    {
+        return -1;
+    }
     Il2CppClass* parent = field->parent;
     size_t fieldIndex = (field - parent->fields);
     fieldIndex += parent->typeDefinition->fieldStart;
