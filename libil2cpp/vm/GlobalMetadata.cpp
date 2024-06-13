@@ -1310,6 +1310,10 @@ static int CompareFieldMarshaledSize(const void* pkey, const void* pelem)
 
 int il2cpp::vm::GlobalMetadata::GetFieldMarshaledSizeForField(const FieldInfo* field)
 {
+    if (hybridclr::metadata::IsInterpreterType(field->parent))
+    {
+        return -1;
+    }
     Il2CppClass* parent = field->parent;
     size_t fieldIndex = (field - parent->fields);
 
