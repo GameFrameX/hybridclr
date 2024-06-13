@@ -1227,6 +1227,10 @@ uint32_t il2cpp::vm::GlobalMetadata::GetFieldOffset(const Il2CppClass* klass, in
 
 int il2cpp::vm::GlobalMetadata::GetFieldMarshaledSizeForField(const FieldInfo* field)
 {
+    if (hybridclr::metadata::IsInterpreterType(field->parent))
+    {
+        return -1;
+    }
     Il2CppClass* parent = field->parent;
     size_t fieldIndex = (field - parent->fields);
     fieldIndex += reinterpret_cast<const Il2CppTypeDefinition*>(parent->typeMetadataHandle)->fieldStart;
