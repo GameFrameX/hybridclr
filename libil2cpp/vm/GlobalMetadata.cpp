@@ -84,18 +84,6 @@ static const Il2CppMetadataRegistration * s_Il2CppMetadataRegistration;
 static Il2CppClass** s_TypeInfoTable = NULL;
 static Il2CppClass** s_TypeInfoDefinitionTable = NULL;
 
-static const int kBitIsValueType = 1;
-static const int kBitIsEnum = 2;
-static const int kBitHasFinalizer = 3;
-static const int kBitHasStaticConstructor = 4;
-static const int kBitIsBlittable = 5;
-static const int kBitIsImportOrWindowsRuntime = 6;
-static const int kPackingSize = 7;     // This uses 4 bits from bit 7 to bit 10
-static const int kPackingSizeIsDefault = 11;
-static const int kClassSizeIsDefault = 12;
-static const int kSpecifiedPackingSize = 13; // This uses 4 bits from bit 13 to bit 16
-static const int kBitIsByRefLike = 17;
-
 template<typename T>
 static T MetadataOffset(const void* metadata, size_t sectionOffset, size_t itemIndex)
 {
