@@ -1085,15 +1085,27 @@ namespace vm
 
     const Il2CppType* Type::GetUnderlyingType(const Il2CppType *type)
     {
-        if (type->type == IL2CPP_TYPE_VALUETYPE && !type->byref && MetadataCache::GetTypeInfoFromType(type)->enumtype)
-            return Class::GetEnumBaseType(MetadataCache::GetTypeInfoFromType(type));
-        if (IsGenericInstance(type))
+        if (type->byref)
         {
-            Il2CppClass* definition = GenericClass::GetTypeDefinition(type->data.generic_class);
-            if (definition != NULL && definition->enumtype && !type->byref)
-                return Class::GetEnumBaseType(definition);
+            return type;
         }
-        return type;
+
+        if (!IsEnum(type))
+        {
+            return type;
+        }
+
+        const Il2CppTypeDefinition* typeDef;
+        if (type->type == IL2CPP_TYPE_VALUETYPE)
+        {
+            typeDef = (const Il2CppTypeDefinition*)type->data.typeHandle;
+        }
+        else
+        {
+            IL2CPP_ASSERT(type->type == IL2CPP_TYPE_GENERICINST);
+            typeDef = (const Il2CppTypeDefinition*)type->data.generic_class->type->data.typeHandle;
+        }
+        return il2cpp::vm::GlobalMetadata::GetIl2CppTypeFromIndex(typeDef->elementTypeIndex);
     }
 
     bool Type::IsGenericInstance(const Il2CppType* type)
@@ -1207,16 +1219,17 @@ namespace vm
         if (type->byref)
             return false;
 
-        if (type->type == IL2CPP_TYPE_VALUETYPE && !MetadataCache::GetTypeInfoFromType(type)->enumtype)
-            return true;
-
         if (type->type == IL2CPP_TYPE_TYPEDBYREF)
             return true;
 
-        if (IsGenericInstance(type) &&
-            GenericClass::IsValueType(type->data.generic_class) &&
-            !GenericClass::IsEnum(type->data.generic_class))
-            return true;
+        if (type->type == IL2CPP_TYPE_VALUETYPE)
+            return !IsEnum(type);
+
+        if (type->type == IL2CPP_TYPE_GENERICINST)
+        {
+            const Il2CppType* genericType = type->data.generic_class->type;
+            return genericType->type == IL2CPP_TYPE_VALUETYPE && !IsEnum(genericType);
+        }
 
         return false;
     }
