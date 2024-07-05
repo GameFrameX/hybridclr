@@ -8,6 +8,7 @@
 #include "vm/MetadataAlloc.h"
 #include "vm/MetadataCache.h"
 #include "vm/MetadataLock.h"
+#include "vm/Type.h"
 #include "il2cpp-class-internals.h"
 #include "il2cpp-runtime-metadata.h"
 #include "il2cpp-runtime-stats.h"
@@ -260,12 +261,12 @@ namespace vm
 
     bool GenericClass::IsEnum(Il2CppGenericClass *gclass)
     {
-        return IsValueType(gclass) && GetTypeDefinition(gclass)->enumtype;
+        return Type::IsEnum(gclass->type);
     }
 
     bool GenericClass::IsValueType(Il2CppGenericClass *gclass)
     {
-        return GetTypeDefinition(gclass)->valuetype;
+        return gclass->type->type == IL2CPP_TYPE_VALUETYPE;
     }
 } /* namespace vm */
 } /* namespace il2cpp */
