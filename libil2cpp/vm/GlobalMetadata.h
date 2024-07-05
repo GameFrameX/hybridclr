@@ -61,6 +61,7 @@ namespace vm
     const int kPackingSizeIsDefault = 11;
     const int kClassSizeIsDefault = 12; // 此参数只用于反射查询，并无实际意义
     const int kSpecifiedPackingSize = 13; // This uses 4 bits from bit 13 to bit 16 。此参数目前只用于反射查询，并无直接用处
+    const int kBitIsByRefLike = 17;
 
     class GlobalMetadata
     {
