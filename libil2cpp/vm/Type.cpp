@@ -16,6 +16,7 @@
 #include "vm/Reflection.h"
 #include "vm/String.h"
 #include "vm/Type.h"
+#include "vm/GlobalMetadata.h"
 #include "vm-utils/VmStringUtils.h"
 #include "il2cpp-class-internals.h"
 #include "il2cpp-object-internals.h"
@@ -1162,11 +1163,16 @@ namespace vm
 
     bool Type::IsEnum(const Il2CppType *type)
     {
-        if (type->type != IL2CPP_TYPE_VALUETYPE)
-            return false;
-
-        Il2CppClass* klass = GetClass(type);
-        return klass->enumtype;
+        if (type->type == IL2CPP_TYPE_VALUETYPE)
+        {
+            const Il2CppTypeDefinition* typeDefinition = (const Il2CppTypeDefinition*)type->data.typeHandle;
+            return (typeDefinition->bitfield >> (kBitIsEnum - 1)) & 0x1;
+        }
+        if (type->type == IL2CPP_TYPE_GENERICINST)
+        {
+            return IsEnum(type->data.generic_class->type);
+        }
+        return false;
     }
 
     bool Type::IsValueType(const Il2CppType *type)
