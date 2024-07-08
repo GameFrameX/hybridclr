@@ -9,7 +9,7 @@ namespace il2cpp
 namespace utils
 {
     const size_t kPageSize = IL2CPP_PAGE_SIZE;
-    const size_t kDefaultRegionSize = 16 * 1024;
+    const size_t kDefaultRegionSize = 64 * 1024;
 // by making all allocations a multiple of this value, we ensure the next
 // allocation will always be aligned to this value
     const size_t kMemoryAlignment = 8;
