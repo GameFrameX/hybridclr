@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string>
 #include "il2cpp-config.h"
 
 struct mscorlib_System_Reflection_MethodInfo;
@@ -49,6 +50,7 @@ namespace System
     {
     public:
         static Il2CppString* getFullName(Il2CppReflectionType* type, bool full_name, bool assembly_qualified);
+        static std::string getFullName2(Il2CppReflectionType* type, bool full_name, bool assembly_qualified);
         static Il2CppArray* GetFields_internal(Il2CppReflectionType* _this, int, Il2CppReflectionType* reflectedType);
         static Il2CppArray* GetFieldsByName(Il2CppReflectionType* _this, Il2CppString* name, int, Il2CppReflectionType* reflectedType);
         static int GetArrayRank(Il2CppReflectionType* type);

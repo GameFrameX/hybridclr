@@ -521,6 +521,20 @@ namespace System
         return il2cpp::vm::String::NewWrapper(name.c_str());
     }
 
+    std::string MonoType::getFullName2(Il2CppReflectionType* type, bool full_name, bool assembly_qualified)
+    {
+        Il2CppTypeNameFormat format;
+
+        if (full_name)
+            format = assembly_qualified ?
+            IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED :
+            IL2CPP_TYPE_NAME_FORMAT_FULL_NAME;
+        else
+            format = IL2CPP_TYPE_NAME_FORMAT_REFLECTION;
+
+        return std::string(vm::Type::GetName(type->type, format));
+    }
+
     Il2CppArray * MonoType::GetGenericArguments(Il2CppReflectionType* type)
     {
         return vm::Type::GetGenericArgumentsInternal(type, false);
