@@ -74,7 +74,7 @@ namespace utils
     void* MemoryPool::Calloc(size_t count, size_t size)
     {
         void* ret = Malloc(count * size);
-        return memset(ret, 0, count * size);
+        return ret;
     }
 
     MemoryPool::Region* MemoryPool::AddRegion(size_t size)
@@ -97,7 +97,7 @@ namespace utils
             m_Regions.push_back(newRegion);
         }
 
-        newRegion->start = newRegion->current = (char*)IL2CPP_MALLOC(allocationSize, IL2CPP_MEM_META_POOL);
+        newRegion->start = newRegion->current = (char*)IL2CPP_MALLOC_ZERO(allocationSize, IL2CPP_MEM_META_POOL);
         newRegion->size = newRegion->free = allocationSize;
 		
 #if IL2CPP_ENABLE_MEM_STATS
