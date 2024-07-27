@@ -419,7 +419,11 @@ bool il2cpp::vm::GlobalMetadata::Initialize(int32_t* imagesCount, int32_t* assem
 
     s_GlobalMetadataHeader = (const Il2CppGlobalMetadataHeader*)s_GlobalMetadata;
     IL2CPP_ASSERT(s_GlobalMetadataHeader->sanity == 0xFAB11BAF);
+#if SUPPORT_METHOD_RETURN_TYPE_CUSTOM_ATTRIBUTE
+    IL2CPP_ASSERT(s_GlobalMetadataHeader->version == 31);
+#else
     IL2CPP_ASSERT(s_GlobalMetadataHeader->version == 29);
+#endif
     IL2CPP_ASSERT(s_GlobalMetadataHeader->stringLiteralOffset == sizeof(Il2CppGlobalMetadataHeader));
 
     s_MetadataImagesCount = *imagesCount = s_GlobalMetadataHeader->imagesSize / sizeof(Il2CppImageDefinition);
@@ -1213,6 +1217,11 @@ uint32_t il2cpp::vm::GlobalMetadata::GetFieldOffset(const Il2CppClass* klass, in
     return offset;
 }
 
+static int CompareFieldMarshaledSize(const void* pkey, const void* pelem)
+{
+    return (int)(((Il2CppFieldMarshaledSize*)pkey)->fieldIndex - ((Il2CppFieldMarshaledSize*)pelem)->fieldIndex);
+}
+
 int il2cpp::vm::GlobalMetadata::GetFieldMarshaledSizeForField(const FieldInfo* field)
 {
     if (hybridclr::metadata::IsInterpreterType(field->parent))
@@ -1221,17 +1230,20 @@ int il2cpp::vm::GlobalMetadata::GetFieldMarshaledSizeForField(const FieldInfo* f
     }
     Il2CppClass* parent = field->parent;
     size_t fieldIndex = (field - parent->fields);
+
+    if (il2cpp::vm::Type::IsGenericInstance(&parent->byval_arg))
+        parent = il2cpp::vm::GenericClass::GetTypeDefinition(parent->generic_class);
+
     fieldIndex += reinterpret_cast<const Il2CppTypeDefinition*>(parent->typeMetadataHandle)->fieldStart;
 
     const Il2CppFieldMarshaledSize *start = (const Il2CppFieldMarshaledSize*)((const char*)s_GlobalMetadata + s_GlobalMetadataHeader->fieldMarshaledSizesOffset);
-    const Il2CppFieldMarshaledSize *entry = start;
-    while (entry < start + s_GlobalMetadataHeader->fieldMarshaledSizesSize / sizeof(Il2CppFieldMarshaledSize))
-    {
-        if (fieldIndex == entry->fieldIndex)
-            return entry->size;
-        entry++;
-    }
 
+    Il2CppFieldMarshaledSize key;
+    key.fieldIndex = (FieldIndex)fieldIndex;
+    const Il2CppFieldMarshaledSize* res = (const Il2CppFieldMarshaledSize*)bsearch(&key, start, s_GlobalMetadataHeader->fieldMarshaledSizesSize / sizeof(Il2CppFieldMarshaledSize), sizeof(Il2CppFieldMarshaledSize), CompareFieldMarshaledSize);
+
+    if (res != NULL)
+        return res->size;
     return -1;
 }
 
@@ -1353,6 +1365,17 @@ Il2CppMetadataEventInfo il2cpp::vm::GlobalMetadata::GetEventInfo(const Il2CppCla
             eventDefintion->token,
     };
 }
+
+#if SUPPORT_METHOD_RETURN_TYPE_CUSTOM_ATTRIBUTE
+uint32_t il2cpp::vm::GlobalMetadata::GetReturnParameterToken(Il2CppMetadataMethodDefinitionHandle handle)
+{
+    const Il2CppMethodDefinition* methodDefinition = reinterpret_cast<const Il2CppMethodDefinition*>(handle);
+
+    IL2CPP_ASSERT(methodDefinition != NULL);
+
+    return methodDefinition->returnParameterToken;
+}
+#endif
 
 static const Il2CppGenericContainer* GetGenericContainerFromIndexInternal(GenericContainerIndex index)
 {

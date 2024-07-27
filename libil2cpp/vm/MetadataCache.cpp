@@ -1316,6 +1316,13 @@ Il2CppMetadataEventInfo il2cpp::vm::MetadataCache::GetEventInfo(const Il2CppClas
     return il2cpp::vm::GlobalMetadata::GetEventInfo(klass, index);
 }
 
+#if SUPPORT_METHOD_RETURN_TYPE_CUSTOM_ATTRIBUTE
+uint32_t il2cpp::vm::MetadataCache::GetReturnParameterToken(Il2CppMetadataMethodDefinitionHandle handle)
+{
+    return il2cpp::vm::GlobalMetadata::GetReturnParameterToken(handle);
+}
+#endif
+
 uint32_t il2cpp::vm::MetadataCache::GetGenericContainerCount(Il2CppMetadataGenericContainerHandle handle)
 {
     return il2cpp::vm::GlobalMetadata::GetGenericContainerCount(handle);
