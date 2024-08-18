@@ -177,7 +177,11 @@ namespace vm
                 IL2CPP_ASSERT(genericTypeDefinition->interfaces_count == klass->interfaces_count);
                 klass->implementedInterfaces = (Il2CppClass**)MetadataCalloc(genericTypeDefinition->interfaces_count, sizeof(Il2CppClass*), IL2CPP_MSTAT_INTERFACE);
                 for (uint16_t i = 0; i < genericTypeDefinition->interfaces_count; i++)
-                    klass->implementedInterfaces[i] = Class::FromIl2CppType(il2cpp::metadata::GenericMetadata::InflateIfNeeded(MetadataCache::GetInterfaceFromOffset(genericTypeDefinition, i), context, false));
+                {
+                    Il2CppClass* intfKlass = Class::FromIl2CppType(il2cpp::metadata::GenericMetadata::InflateIfNeeded(MetadataCache::GetInterfaceFromOffset(genericTypeDefinition, i), context, false));
+                    Class::InitLocked(intfKlass, lock);
+                    klass->implementedInterfaces[i] = intfKlass;
+                }
             }
         }
         else if (klass->rank > 0)
@@ -191,7 +195,11 @@ namespace vm
             {
                 klass->implementedInterfaces = (Il2CppClass**)MetadataCalloc(klass->interfaces_count, sizeof(Il2CppClass*), IL2CPP_MSTAT_INTERFACE);
                 for (uint16_t i = 0; i < klass->interfaces_count; i++)
-                    klass->implementedInterfaces[i] = Class::FromIl2CppType(MetadataCache::GetInterfaceFromOffset(klass, i));
+                {
+                    Il2CppClass* intfKlass = Class::FromIl2CppType(MetadataCache::GetInterfaceFromOffset(klass, i));
+                    Class::InitLocked(intfKlass, lock);
+                    klass->implementedInterfaces[i] = intfKlass;
+                }
             }
         }
 
