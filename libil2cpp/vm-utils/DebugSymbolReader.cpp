@@ -296,11 +296,16 @@ namespace utils
 
     bool DebugSymbolReader::DebugSymbolsAvailable()
     {
-        #if IL2CPP_MONO_DEBUGGER
+        /*
+        #if IL2CPP_TINY
+        return false;
+        #elif IL2CPP_MONO_DEBUGGER
         return true;
         #else
         return s_usym.debugSymbolData != NULL;
         #endif
+        */
+        return true;
     }
 } /* namespace utils */
 } /* namespace il2cpp */
