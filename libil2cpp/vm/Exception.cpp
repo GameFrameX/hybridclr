@@ -11,6 +11,7 @@
 #include "vm/StackTrace.h"
 #include "vm/String.h"
 #include "vm/Type.h"
+#include "vm/Reflection.h"
 #include "Image.h"
 #include "../utils/StringUtils.h"
 #include "../utils/StringViewUtils.h"
@@ -44,15 +45,30 @@ namespace vm
             if (numberOfFrames == 0 && lastManagedFrame != NULL)
             {
                 // We didn't get any call stack. If we have one frame from codegen, use it.
-                ips = Array::New(il2cpp_defaults.int_class, 1);
-                il2cpp_array_set(ips, const MethodInfo*, 0, lastManagedFrame);
+                Il2CppStackFrame* stackFrame = (Il2CppStackFrame*)vm::Object::New(il2cpp_defaults.stack_frame_class);
+                IL2CPP_OBJECT_SETREF(stackFrame, method, vm::Reflection::GetMethodObject(lastManagedFrame, NULL));
+
+                ips = Array::New(il2cpp_defaults.stack_frame_class, 1);
+                il2cpp_array_setref(ips, 0, stackFrame);
             }
             else
             {
                 size_t i = numberOfFrames - 1;
-                ips = Array::New(il2cpp_defaults.int_class, numberOfFrames);
-                for (StackFrames::const_iterator iter = frames.begin(); iter != frames.end(); ++iter, --i)
-                    il2cpp_array_set(ips, const MethodInfo*, i, (*iter).method);
+                ips = Array::New(il2cpp_defaults.stack_frame_class, numberOfFrames);
+                for (size_t frame = 0; frame != frames.size() && i >= 0; ++frame, --i)
+				{
+                    const Il2CppStackFrameInfo& stackFrameInfo = frames[frame];
+
+                    Il2CppStackFrame* stackFrame = (Il2CppStackFrame*)vm::Object::New(il2cpp_defaults.stack_frame_class);
+
+                    IL2CPP_OBJECT_SETREF(stackFrame, method, vm::Reflection::GetMethodObject(stackFrameInfo.method, NULL));
+                    stackFrame->line = stackFrameInfo.sourceCodeLineNumber;
+                    stackFrame->il_offset = stackFrameInfo.ilOffset;
+                    if (stackFrameInfo.filePath != NULL && strlen(stackFrameInfo.filePath) != 0)
+                        IL2CPP_OBJECT_SETREF(stackFrame, filename, il2cpp::vm::String::New(stackFrameInfo.filePath));
+
+                    il2cpp_array_setref(ips, i, stackFrame);
+				}
             }
 
             IL2CPP_ASSERT(ips != NULL);

@@ -34,12 +34,8 @@ namespace Diagnostics
 
         for (i = skip; i < len; i++)
         {
-            Il2CppStackFrame *sf = (Il2CppStackFrame*)vm::Object::New(il2cpp_defaults.stack_frame_class);
-            MethodInfo* method = il2cpp_array_get(ta, MethodInfo*, i);
-
-            IL2CPP_OBJECT_SETREF(sf, method, vm::Reflection::GetMethodObject(method, NULL));
-
-            il2cpp_array_setref(res, i, sf);
+            Il2CppStackFrame* stackFrame = il2cpp_array_get(ta, Il2CppStackFrame*, i);
+            il2cpp_array_setref(res, i, stackFrame);
         }
 
         return res;
