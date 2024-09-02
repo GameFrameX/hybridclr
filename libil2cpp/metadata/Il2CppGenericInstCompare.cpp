@@ -36,6 +36,10 @@ namespace metadata
 
     bool Il2CppGenericInstCompare::AreEqual(const Il2CppGenericInst* t1, const Il2CppGenericInst* t2)
     {
+        if (t1 == t2)
+        {
+            return true;
+        }
         if (t1->type_argc != t2->type_argc)
             return false;
 
