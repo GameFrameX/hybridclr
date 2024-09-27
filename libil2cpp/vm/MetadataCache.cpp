@@ -79,7 +79,7 @@ static il2cpp::vm::WindowsRuntimeTypeNameToClassMap s_WindowsRuntimeTypeNameToCl
 static il2cpp::vm::ClassToWindowsRuntimeTypeNameMap s_ClassToWindowsRuntimeTypeNameMap;
 #endif
 
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
 static il2cpp::vm::Il2CppGenericMethodTableItem* s_GenericMethodTableVector = NULL;
 static uint32_t s_GenericMethodTableVectorSize = 0;
 #endif
@@ -308,7 +308,7 @@ void il2cpp::vm::MetadataCache::InitializeGuidToClassTable()
 void il2cpp::vm::MetadataCache::InitializeGCSafe()
 {
     il2cpp::vm::GlobalMetadata::InitializeStringLiteralTable();
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
     assert(s_GenericMethodSet.size() == 0);
     s_GenericMethodTableVectorSize = il2cpp::vm::GlobalMetadata::InitializeGenericMethodTableFast(&s_GenericMethodTableVector);
 #else
@@ -520,7 +520,7 @@ const Il2CppGenericMethod* il2cpp::vm::MetadataCache::GetGenericMethod(const Met
     method.context.class_inst = classInst;
     method.context.method_inst = methodInst;
 
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
     Il2CppGenericMethodTableItem item;
     item.method = &method;
     Il2CppGenericMethodTableItem* itemIter = std::lower_bound(s_GenericMethodTableVector, s_GenericMethodTableVector + s_GenericMethodTableVectorSize, item);
@@ -722,12 +722,12 @@ il2cpp::vm::Il2CppGenericMethodPointers il2cpp::vm::MetadataCache::GetGenericMet
     method.context.class_inst = context->class_inst;
     method.context.method_inst = context->method_inst;
 
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
     Il2CppGenericMethodTableItem item;
     item.method = &method;
 #endif
 
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
     Il2CppGenericMethodTableItem* iter = std::lower_bound(s_GenericMethodTableVector, s_GenericMethodTableVector + s_GenericMethodTableVectorSize, item);
     if (iter != s_GenericMethodTableVector + s_GenericMethodTableVectorSize && *iter == item)
         return MakeGenericMethodPointers(iter->indices, false);
@@ -741,7 +741,7 @@ il2cpp::vm::Il2CppGenericMethodPointers il2cpp::vm::MetadataCache::GetGenericMet
     method.context.class_inst = GetSharedInst(context->class_inst);
     method.context.method_inst = GetSharedInst(context->method_inst);
 
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
     iter = std::lower_bound(s_GenericMethodTableVector, s_GenericMethodTableVector + s_GenericMethodTableVectorSize, item);
     if (iter != s_GenericMethodTableVector + s_GenericMethodTableVectorSize && *iter == item)
         return MakeGenericMethodPointers(iter->indices, false);
@@ -755,7 +755,7 @@ il2cpp::vm::Il2CppGenericMethodPointers il2cpp::vm::MetadataCache::GetGenericMet
     method.context.class_inst = GetFullySharedInst(methodDefinition->klass->genericContainerHandle, context->class_inst);
     method.context.method_inst = GetFullySharedInst(methodDefinition->genericContainerHandle, context->method_inst);
 
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
     iter = std::lower_bound(s_GenericMethodTableVector, s_GenericMethodTableVector + s_GenericMethodTableVectorSize, item);
     if (iter != s_GenericMethodTableVector + s_GenericMethodTableVectorSize && *iter == item)
         return MakeGenericMethodPointers(iter->indices, true);
@@ -1420,10 +1420,10 @@ Il2CppClass* il2cpp::vm::MetadataCache::GetTypeInfoFromTypeSourcePair(const Il2C
     return il2cpp::vm::GlobalMetadata::GetTypeInfoFromTypeSourcePair(pair);
 }
 
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
 bool il2cpp::vm::Il2CppGenericMethodTableItem::operator<(const Il2CppGenericMethodTableItem& other) const
 {
-    if (method->methodDefinition != other.method->methodDefinition) 
+    if (method->methodDefinition != other.method->methodDefinition)
     {
         return method->methodDefinition < other.method->methodDefinition;
     }
@@ -1436,7 +1436,7 @@ bool il2cpp::vm::Il2CppGenericMethodTableItem::operator<(const Il2CppGenericMeth
 
 bool il2cpp::vm::Il2CppGenericMethodTableItem::operator==(const Il2CppGenericMethodTableItem& other) const
 {
-    if (method->methodDefinition != other.method->methodDefinition) 
+    if (method->methodDefinition != other.method->methodDefinition)
         return false;
     const Il2CppGenericContext& ctxa = method->context;
     const Il2CppGenericContext& ctxb = other.method->context;

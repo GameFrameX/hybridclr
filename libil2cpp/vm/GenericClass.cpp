@@ -104,16 +104,22 @@ namespace vm
 
         Class::SetupProperties(genericTypeDefinition);
 
-        const PropertyInfo** properties = (const PropertyInfo**)MetadataCalloc(propertyCount, sizeof(PropertyInfo*), IL2CPP_MSTAT_PROPERTY);
+        //const PropertyInfo** properties = (const PropertyInfo**)MetadataCalloc(propertyCount, sizeof(PropertyInfo*), IL2CPP_MSTAT_PROPERTY);
+        if(genericInstanceType->properties == nullptr)
+            genericInstanceType->properties = (const PropertyInfo**)MetadataCalloc(propertyCount, sizeof(PropertyInfo*), IL2CPP_MSTAT_PROPERTY);
+        const PropertyInfo** properties = genericInstanceType->properties;
         
         for (uint16_t propertyIndex = 0; propertyIndex < propertyCount; ++propertyIndex)
         {
+            if (properties[propertyIndex] != nullptr)
+                continue;
+
             PropertyInfo* property = (PropertyInfo*)MetadataCalloc(1, sizeof(PropertyInfo), IL2CPP_MSTAT_PROPERTY);
             InflatePropertyDefinition(genericTypeDefinition->properties[propertyIndex], property, genericInstanceType, GenericClass::GetContext(genericInstanceType->generic_class));
             properties[propertyIndex] = property;
         }
 
-        genericInstanceType->properties = properties;
+        //genericInstanceType->properties = properties;
     }
 
     const PropertyInfo* GenericClass::GetOrSetupOneProperty(Il2CppClass* genericInstanceType, PropertyIndex index) 

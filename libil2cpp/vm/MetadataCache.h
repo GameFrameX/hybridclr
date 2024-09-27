@@ -60,7 +60,7 @@ namespace vm
     typedef Il2CppHashMap<il2cpp::metadata::Il2CppSignature, int32_t, il2cpp::metadata::Il2CppSignatureHash, il2cpp::metadata::Il2CppSignatureCompare> Il2CppUnresolvedSignatureMap;
     typedef Il2CppHashMap<const Il2CppGenericMethod*, const Il2CppGenericMethodIndices*, il2cpp::metadata::Il2CppGenericMethodHash, il2cpp::metadata::Il2CppGenericMethodCompare> Il2CppMethodTableMap;
 
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
     typedef struct Il2CppGenericMethodTableItem
     {
         Il2CppGenericMethod* method;

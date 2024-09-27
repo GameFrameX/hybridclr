@@ -18,7 +18,7 @@ struct Il2CppGenericInst;
 struct Il2CppGenericMethod;
 struct Il2CppType;
 struct Il2CppString;
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
 namespace il2cpp
 {
 namespace vm
@@ -86,7 +86,7 @@ namespace vm
 #endif
         static void InitializeUnresolvedSignatureTable(Il2CppUnresolvedSignatureMap& unresolvedSignatureMap);
         static void InitializeGenericMethodTable(Il2CppMethodTableMap& methodTableMap);
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
         static uint32_t InitializeGenericMethodTableFast(Il2CppGenericMethodTableItem** outVector);
 #endif
 

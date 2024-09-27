@@ -608,7 +608,7 @@ void il2cpp::vm::GlobalMetadata::InitializeGenericMethodTable(Il2CppMethodTableM
     }
 }
 
-#if ENABLE_HMI_MODE
+#if ENABLE_HMI_MODE || PLATFORM_WEIXINMINIGAME
 uint32_t il2cpp::vm::GlobalMetadata::InitializeGenericMethodTableFast(Il2CppGenericMethodTableItem** outVector)
 {
     *outVector = (Il2CppGenericMethodTableItem*)MetadataMalloc(s_Il2CppMetadataRegistration->genericMethodTableCount * sizeof(Il2CppGenericMethodTableItem), IL2CPP_MSTAT_METHOD);
