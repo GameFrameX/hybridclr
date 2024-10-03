@@ -31,6 +31,7 @@
 #include "utils/HashUtils.h"
 #include "utils/Il2CppHashMap.h"
 #include "utils/Il2CppHashSet.h"
+#include "utils/InitOnce.h"
 #include "utils/Memory.h"
 #include "utils/StringUtils.h"
 #include "utils/PathUtils.h"
@@ -134,23 +135,17 @@ const MethodInfo* il2cpp::vm::GlobalMetadata::GetMethodInfoFromMethodDefinitionI
     }
     IL2CPP_ASSERT(index >= 0 && static_cast<uint32_t>(index) <= s_GlobalMetadataHeader->methodsSize / sizeof(Il2CppMethodDefinition));
 
-    if (!s_MethodInfoDefinitionTable[index])
+    return utils::InitOnce(&s_MethodInfoDefinitionTable[index], &g_MetadataLock, [index](il2cpp::os::FastAutoLock& _)
     {
         const Il2CppMethodDefinition* methodDefinition = il2cpp::vm::GlobalMetadata::GetMethodDefinitionFromIndex(index);
         Il2CppClass* typeInfo = il2cpp::vm::GlobalMetadata::GetTypeInfoFromTypeDefinitionIndex(methodDefinition->declaringType);
         //[WL]
-        //il2cpp::vm::Class::SetupMethods(typeInfo);
-        
         const Il2CppTypeDefinition* typeDefinition = reinterpret_cast<const Il2CppTypeDefinition*>(typeInfo->typeMetadataHandle);
         MethodIndex indexInType = index - typeDefinition->methodStart;
 
-        //il2cpp::vm::Class::GetOrSetupOneMethod(typeInfo, indexInType);
-        //s_MethodInfoDefinitionTable[index] = typeInfo->methods[indexInType];
-        s_MethodInfoDefinitionTable[index] = il2cpp::vm::Class::GetOrSetupOneMethod(typeInfo, indexInType);
+        return il2cpp::vm::Class::GetOrSetupOneMethod(typeInfo, indexInType);
+    });
     }
-
-    return s_MethodInfoDefinitionTable[index];
-}
 
 static const Il2CppEventDefinition* GetEventDefinitionFromIndex(const Il2CppImage* image, EventIndex index)
 {
@@ -265,9 +260,9 @@ il2cpp::vm::PackingSize il2cpp::vm::GlobalMetadata::ConvertPackingSizeToEnum(uin
 static const Il2CppGenericMethod* GetGenericMethodFromIndex(GenericMethodIndex index)
 {
     IL2CPP_ASSERT(index < s_Il2CppMetadataRegistration->methodSpecsCount);
-    if (s_GenericMethodTable[index])
-        return s_GenericMethodTable[index];
 
+    return il2cpp::utils::InitOnce(&s_GenericMethodTable[index], &il2cpp::vm::g_MetadataLock, [index](il2cpp::os::FastAutoLock& _)
+    {
     const Il2CppMethodSpec* methodSpec = s_Il2CppMetadataRegistration->methodSpecs + index;
     const MethodInfo* methodDefinition = il2cpp::vm::GlobalMetadata::GetMethodInfoFromMethodDefinitionIndex(methodSpec->methodDefinitionIndex);
     const Il2CppGenericInst* classInst = NULL;
@@ -282,9 +277,8 @@ static const Il2CppGenericMethod* GetGenericMethodFromIndex(GenericMethodIndex i
         IL2CPP_ASSERT(methodSpec->methodIndexIndex < s_Il2CppMetadataRegistration->genericInstsCount);
         methodInst = s_Il2CppMetadataRegistration->genericInsts[methodSpec->methodIndexIndex];
     }
-    s_GenericMethodTable[index] = il2cpp::vm::MetadataCache::GetGenericMethod(methodDefinition, classInst, methodInst);
-
-    return s_GenericMethodTable[index];
+        return il2cpp::vm::MetadataCache::GetGenericMethod(methodDefinition, classInst, methodInst);
+    });
 }
 
 static const MethodInfo* GetMethodInfoFromEncodedIndex(EncodedMethodIndex methodIndex)
@@ -536,7 +530,11 @@ void* il2cpp::vm::GlobalMetadata::InitializeRuntimeMetadata(uintptr_t* metadataP
 
     IL2CPP_ASSERT(IsRuntimeMetadataInitialized(initialized) && "ERROR: The low bit of the metadata item is still set, alignment issue");
 
-    il2cpp::os::Atomic::ExchangePointer((void**)metadataPointer, initialized);
+    if (initialized != NULL)
+    {
+
+        il2cpp::os::Atomic::PublishPointer((void**)metadataPointer, initialized);
+    }
 
     return initialized;
 }
@@ -722,7 +720,6 @@ void il2cpp::vm::GlobalMetadata::BuildIl2CppAssembly(Il2CppAssembly* assembly, A
     Il2CppAssemblyName* assemblyName = &assembly->aname;
     const Il2CppAssemblyNameDefinition* assemblyNameDefinition = &assemblyDefinition->aname;
 
-    Il2CppImage* image = il2cpp::vm::MetadataCache::GetImageFromIndex(assemblyDefinition->imageIndex);
     assemblyName->name = GetStringFromIndex(assemblyNameDefinition->nameIndex);
     assemblyName->culture = GetStringFromIndex(assemblyNameDefinition->cultureIndex);
     assemblyName->public_key = (const uint8_t*)GetStringFromIndex(assemblyNameDefinition->publicKeyIndex);
@@ -847,17 +844,8 @@ Il2CppClass* il2cpp::vm::GlobalMetadata::GetTypeInfoFromTypeDefinitionIndex(Type
 
     IL2CPP_ASSERT(index >= 0 && static_cast<uint32_t>(index) < s_GlobalMetadataHeader->typeDefinitionsSize / sizeof(Il2CppTypeDefinition));
 
-    if (!s_TypeInfoDefinitionTable[index])
-    {
-        // we need to use the metadata lock, since we may need to retrieve other Il2CppClass's when setting. Our parent may be a generic instance for example
-        il2cpp::os::FastAutoLock lock(&il2cpp::vm::g_MetadataLock);
-        // double checked locking
-        if (!s_TypeInfoDefinitionTable[index])
-            s_TypeInfoDefinitionTable[index] = FromTypeDefinition(index);
+    return utils::InitOnce(&s_TypeInfoDefinitionTable[index], &il2cpp::vm::g_MetadataLock, [index](il2cpp::os::FastAutoLock& _) { return FromTypeDefinition(index); });
     }
-
-    return s_TypeInfoDefinitionTable[index];
-}
 
 Il2CppClass* il2cpp::vm::GlobalMetadata::GetTypeInfoFromHandle(Il2CppMetadataTypeHandle handle)
 {
@@ -1522,6 +1510,18 @@ Il2CppClass* il2cpp::vm::GlobalMetadata::GetParameterDeclaringType(Il2CppMetadat
     return GetTypeInfoFromTypeDefinitionIndex(static_cast<TypeDefinitionIndex>(genericContainer->ownerIndex));
 }
 
+const MethodInfo* il2cpp::vm::GlobalMetadata::GetParameterDeclaringMethod(Il2CppMetadataGenericParameterHandle handle)
+{
+    const Il2CppGenericParameter* genericParameter = reinterpret_cast<const Il2CppGenericParameter*>(handle);
+
+    const Il2CppGenericContainer* genericContainer =  GetGenericContainerFromIndexInternal(genericParameter->ownerIndex);
+
+    if (genericContainer->is_method)
+        return GetMethodInfoFromMethodDefinitionIndex(genericContainer->ownerIndex);
+
+    return NULL;
+}
+
 Il2CppMetadataGenericParameterHandle il2cpp::vm::GlobalMetadata::GetGenericParameterFromIndex(Il2CppMetadataGenericContainerHandle handle, GenericContainerParameterIndex index)
 {
     const Il2CppGenericContainer* genericContainer = reinterpret_cast<const Il2CppGenericContainer*>(handle);
@@ -1837,18 +1837,16 @@ Il2CppClass* il2cpp::vm::GlobalMetadata::GetTypeInfoFromTypeIndex(TypeIndex inde
 
     IL2CPP_ASSERT(index < s_Il2CppMetadataRegistration->typesCount && "Invalid type index ");
 
-    if (s_TypeInfoTable[index])
-        return s_TypeInfoTable[index];
-
+    return utils::InitOnce(&s_TypeInfoTable[index], &g_MetadataLock, [index, throwOnError](il2cpp::os::FastAutoLock& _)
+    {
     const Il2CppType* type = s_Il2CppMetadataRegistration->types[index];
 
     Il2CppClass *klass = Class::FromIl2CppType(type, throwOnError);
     if (klass != NULL)
-    {
-        s_TypeInfoTable[index] = ClassInlines::InitFromCodegenSlow(klass, throwOnError);
+            ClassInlines::InitFromCodegenSlow(klass, throwOnError);
+        return klass;
+    });
     }
-    return s_TypeInfoTable[index];
-}
 
 const MethodInfo* il2cpp::vm::GlobalMetadata::GetMethodInfoFromMethodHandle(Il2CppMetadataMethodDefinitionHandle handle)
 {

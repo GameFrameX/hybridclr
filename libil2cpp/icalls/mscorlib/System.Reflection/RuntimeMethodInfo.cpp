@@ -381,6 +381,9 @@ namespace Reflection
 
             il2cpp::vm::Class::SetupVTable(klass);
 
+            if (method2->slot >= klass->vtable_count)
+                return method;
+
             result = klass->vtable[method2->slot].method;
 
             if (result == NULL || il2cpp::vm::Method::IsEntryPointNotFoundMethodInfo(result))
