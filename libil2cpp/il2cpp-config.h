@@ -6,7 +6,7 @@
 
 #include "hybridclr/generated/UnityVersion.h"
 
-#if HYBRIDCLR_UNITY_VERSION >= 20220333
+#if HYBRIDCLR_TUANJIE_VERSION >= 10301
 #define SUPPORT_METHOD_RETURN_TYPE_CUSTOM_ATTRIBUTE 1
 #endif
 

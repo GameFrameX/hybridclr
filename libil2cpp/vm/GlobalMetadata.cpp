@@ -432,11 +432,17 @@ bool il2cpp::vm::GlobalMetadata::Initialize(int32_t* imagesCount, int32_t* assem
     s_GlobalMetadataHeader = (const Il2CppGlobalMetadataHeader*)s_GlobalMetadata;
     IL2CPP_ASSERT(s_GlobalMetadataHeader->sanity == 0xFAB11BAF);
 #if SUPPORT_METHOD_RETURN_TYPE_CUSTOM_ATTRIBUTE
+#if SLIM_GLOBAL_METADATA_FILE
+    IL2CPP_ASSERT(s_GlobalMetadataHeader->version == 32);
+#else
     IL2CPP_ASSERT(s_GlobalMetadataHeader->version == 31);
-#elif SLIM_GLOBAL_METADATA_FILE
+#endif
+#else
+#if SLIM_GLOBAL_METADATA_FILE
     IL2CPP_ASSERT(s_GlobalMetadataHeader->version == 30);
 #else
     IL2CPP_ASSERT(s_GlobalMetadataHeader->version == 29);
+#endif
 #endif
     IL2CPP_ASSERT(s_GlobalMetadataHeader->stringLiteralOffset == sizeof(Il2CppGlobalMetadataHeader));
 
