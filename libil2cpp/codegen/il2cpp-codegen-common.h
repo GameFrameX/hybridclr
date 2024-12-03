@@ -43,6 +43,14 @@ inline void Il2CppCodeGenWriteBarrierForType(const Il2CppType* type, void** targ
 inline void Il2CppCodeGenWriteBarrierForClass(Il2CppClass* klass, void** targetAddress, void* object) {}
 #endif
 
+template<typename TD, typename TS>
+IL2CPP_FORCE_INLINE_FOR_MINIGAME void* il2cpp_codegen_memcpy_with_write_barrier(TD dest, TS src, size_t count, Il2CppClass* klass)
+{
+    void* result = memcpy((void*)dest, (void*)src, count);
+    Il2CppCodeGenWriteBarrierForClass(klass, (void**)dest, (void*)src);
+    return result;
+}
+
 IL2CPP_FORCE_INLINE_FOR_MINIGAME void* il2cpp_codegen_memcpy(void* dest, const void* src, size_t count)
 {
     return memcpy(dest, src, count);
