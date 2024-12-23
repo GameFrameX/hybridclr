@@ -163,8 +163,8 @@ namespace metadata
             // instead let's use its natural alignment, without regard for packing. So if it's alignment
             // is less than the compiler's minimum alignment (4 bytes), lets use the natural alignment if we have it.
             uint8_t alignment = sa.alignment;
-            if (alignment < 4 && sa.naturalAlignment != 0)
-                alignment = sa.naturalAlignment;
+            //if (alignment < 4 && sa.naturalAlignment != 0)
+            //    alignment = sa.naturalAlignment;
             if (packing != 0)
                 alignment = std::min(sa.alignment, packing);
             size_t offset = data.actualClassSize;
