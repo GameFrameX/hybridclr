@@ -19,6 +19,7 @@ namespace utils
         size_t TotalSize();
 
         static size_t RegionSize();
+        bool Contains(const void* data) const;
     private:
         struct Region;
         typedef std::list<Region*> RegionList;

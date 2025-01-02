@@ -89,6 +89,11 @@ namespace vm
         return (Il2CppGenericMethod*)s_GenericMethodMemoryPool->Calloc(1, sizeof(Il2CppGenericMethod));
     }
 
+    bool MetadataContains(const void* data)
+    {
+        return s_MetadataMemoryPool->Contains(data);
+    }
+
 #if IL2CPP_ENABLE_MEM_STATS
     std::size_t mem_stats_get_metadata_free() {
         return s_MetadataMemoryPool->FreeSize() + s_GenericClassMemoryPool->FreeSize() + s_GenericMethodMemoryPool->FreeSize();
