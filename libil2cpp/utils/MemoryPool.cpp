@@ -71,6 +71,17 @@ namespace utils
         return memset(ret, 0, count * size);
     }
 
+    bool MemoryPool::Contains(const void* data) const
+    {
+        for (RegionList::const_iterator iter = m_Regions.begin(); iter != m_Regions.end(); ++iter)
+        {
+			Region* region = *iter;
+			if (data >= region->start && data < region->start + region->size)
+				return true;
+        }
+        return false;
+    }
+
     MemoryPool::Region* MemoryPool::AddRegion(size_t size)
     {
         Region* newRegion = (Region*)IL2CPP_MALLOC(sizeof(Region));
