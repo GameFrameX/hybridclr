@@ -1117,8 +1117,8 @@ namespace vm
                 return;
             }
 
-            klass->methods = (const MethodInfo**)IL2CPP_CALLOC(klass->method_count, sizeof(MethodInfo*));
-            MethodInfo* methods = (MethodInfo*)IL2CPP_CALLOC(klass->method_count, sizeof(MethodInfo));
+            klass->methods = (const MethodInfo**)MetadataCalloc(klass->method_count, sizeof(MethodInfo*));
+            MethodInfo* methods = (MethodInfo*)MetadataCalloc(klass->method_count, sizeof(MethodInfo));
             MethodInfo* newMethod = methods;
 
             MethodIndex start = klass->typeDefinition->methodStart;
@@ -1158,7 +1158,7 @@ namespace vm
                 newMethod->klass = klass;
                 newMethod->return_type = MetadataCache::GetIl2CppTypeFromIndex(methodDefinition->returnType);
 
-                ParameterInfo* parameters = (ParameterInfo*)IL2CPP_CALLOC(methodDefinition->parameterCount, sizeof(ParameterInfo));
+                ParameterInfo* parameters = (ParameterInfo*)MetadataCalloc(methodDefinition->parameterCount, sizeof(ParameterInfo));
                 ParameterInfo* newParameter = parameters;
                 for (uint16_t paramIndex = 0; paramIndex < methodDefinition->parameterCount; ++paramIndex)
                 {
@@ -1328,7 +1328,7 @@ namespace vm
             // we need methods initialized since we reference them via index below
             SetupMethodsLocked(klass, lock);
 
-            EventInfo* events = (EventInfo*)IL2CPP_CALLOC(klass->event_count, sizeof(EventInfo));
+            EventInfo* events = (EventInfo*)MetadataCalloc(klass->event_count, sizeof(EventInfo));
             EventInfo* newEvent = events;
 
             EventIndex start = klass->typeDefinition->eventStart;
@@ -1382,7 +1382,7 @@ namespace vm
             // we need methods initialized since we reference them via index below
             SetupMethodsLocked(klass, lock);
 
-            PropertyInfo* properties = (PropertyInfo*)IL2CPP_CALLOC(klass->property_count, sizeof(PropertyInfo));
+            PropertyInfo* properties = (PropertyInfo*)MetadataCalloc(klass->property_count, sizeof(PropertyInfo));
             PropertyInfo* newProperty = properties;
 
             PropertyIndex start = klass->typeDefinition->propertyStart;
